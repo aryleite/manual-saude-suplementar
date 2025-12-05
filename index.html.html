@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manual Interativo – Saúde Suplementar</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f1f1f1;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        max-width: 650px;
+        margin: 40px auto;
+        background: #fff;
+        padding: 30px;
+        border-radius: 6px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .title {
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        color: #1a2e46;
+    }
+    .question {
+        font-size: 18px;
+        margin-bottom: 25px;
+        color: #333;
+    }
+    .btn-area {
+        display: flex;
+        gap: 15px;
+    }
+    button {
+        padding: 12px 25px;
+        font-size: 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .btn-yes {
+        background: #1351b4;
+        color: white;
+    }
+    .btn-no {
+        background: #6c757d;
+        color: white;
+    }
+    .result {
+        margin-top: 25px;
+        padding: 20px;
+        background: #e9ecef;
+        border-radius: 4px;
+        display: none;
+    }
+    .result h2 {
+        margin-top: 0;
+        color: #1a2e46;
+    }
+</style>
+
+</head>
+<body>
+
+<div class="container">
+    <div class="title">Manual Interativo – Saúde Suplementar</div>
+
+    <div id="question-box">
+        <div class="question" id="question-text">
+            O servidor já possui plano anterior?
+        </div>
+
+        <div class="btn-area">
+            <button class="btn-yes" onclick="next(true)">Sim</button>
+            <button class="btn-no" onclick="next(false)">Não</button>
+        </div>
+    </div>
+
+    <div id="result-box" class="result"></div>
+</div>
+
+<script>
+// Fluxo de perguntas e estados
+
+let step = "inicio";
+
+function next(answer) {
+    switch(step) {
+
+        case "inicio":
+            if (answer === false) {
+                // Sem plano anterior → Situação 1
+                step = "1-tipo-plano";
+                updateQuestion("O novo plano é conveniado (GEAP/ASSEFAZ)?");
+            } else {
+                // Com plano anterior → Situação 2
+                step = "2-plano-anterior-conveniado";
+                updateQuestion("O plano anterior era conveniado (GEAP/ASSEFAZ)?");
+            }
+            break;
+
+        /* ---------------------------
+           SITUAÇÃO 1 – NOVO PLANO
+        ----------------------------*/
+        case "1-tipo-plano":
+            if (answer === true) {
+                showResult("Situação 1.1 – Cadastro de plano conveniado", 
+                    "Cole aqui o texto da Situação 1.1 do manual.");
+            } else {
+                showResult("Situação 1.2 – Cadastro de plano não conveniado",
+                    "Cole aqui o texto da Situação 1.2 do manual.");
+            }
+            break;
+
+        /* ---------------------------
+           SITUAÇÃO 2 – TROCA DE PLANO
+        ----------------------------*/
+        case "2-plano-anterior-conveniado":
+            if (answer === true) {
+                step = "2-novo-conveniado";
+                updateQuestion("O novo plano também é conveniado?");
+            } else {
+                step = "2-novo-a-partir-nao-conveniado";
+                updateQuestion("O novo plano é conveniado?");
+            }
+            break;
+
+        // Se plano anterior era conveniado:
+        case "2-novo-conveniado":
+            if (answer === true) {
+                showResult("Situação 2.1 – Troca conveniado → conveniado",
+                    "Cole aqui o texto da Situação 2.1 do manual.");
+            } else {
+                showResult("Situação 2.2 – Troca conveniado → não conveniado",
+                    "Cole aqui o texto da Situação 2.2 do manual.");
+            }
+            break;
+
+        // Se plano anterior NÃO era conveniado:
+        case "2-novo-a-partir-nao-conveniado":
+            if (answer === true) {
+                showResult("Situação 2.3 – Troca não conveniado → conveniado",
+                    "Cole aqui o texto da Situação 2.3 do manual.");
+            } else {
+                showResult("Situação 2.4 – Troca não conveniado → não conveniado",
+                    "Cole aqui o texto da Situação 2.4 do manual.");
+            }
+            break;
+    }
+}
+
+function updateQuestion(text) {
+    document.getElementById("question-text").innerText = text;
+}
+
+function showResult(title, content) {
+    document.getElementById("question-box").style.display = "none";
+    const box = document.getElementById("result-box");
+    box.style.display = "block";
+    box.innerHTML = `<h2>${title}</h2><p>${content}</p>`;
+}
+</script>
+
+</body>
+</html>
